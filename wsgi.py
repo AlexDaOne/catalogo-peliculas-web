@@ -1,7 +1,6 @@
 from api.peliculas import app
 from flask import Response
 
-# El HTML ahora vive DENTRO del código Python
 INDEX_HTML = """
 <!DOCTYPE html>
 <html lang="es">
@@ -10,17 +9,152 @@ INDEX_HTML = """
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo de Películas</title>
     <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f4f4f4; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
-        button { background-color: #0070f3; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #0051a2; }
-        #resultado { margin-top: 20px; }
-        .peli-item { border-bottom: 1px solid #eee; padding: 10px 0; }
-    </style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+    :root {
+        --bg-color: #141414;
+        --card-bg: #1f1f1f;
+        --primary: #E50914;
+        --accent: #FF9900;
+        --text-main: #ffffff;
+        --text-sec: #b3b3b3;
+        --radius: 8px;
+    }
+
+    body {
+        font-family: 'Montserrat', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+    }
+
+    h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 30px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        border-bottom: 2px solid var(--primary);
+        display: inline-block;
+        padding-bottom: 10px;
+        width: 100%;
+    }
+
+    .card {
+        background-color: var(--card-bg);
+        padding: 25px;
+        border-radius: var(--radius);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        margin-bottom: 25px;
+        border-left: 4px solid var(--primary);
+        transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-3px);
+    }
+
+    h3 {
+        margin-top: 0;
+        color: var(--primary);
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    input {
+        background-color: #333;
+        border: 1px solid #444;
+        color: white;
+        padding: 12px;
+        margin: 8px 0;
+        width: 100%;
+        box-sizing: border-box;
+        border-radius: 4px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+
+    input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background-color: #444;
+    }
+
+    button {
+        padding: 12px 20px;
+        margin: 10px 5px 0 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    button[onclick="insertar()"], 
+    button[onclick="buscarGenero()"] {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    button[onclick="insertar()"]:hover, 
+    button[onclick="buscarGenero()"]:hover {
+        background-color: #f40612;
+        box-shadow: 0 0 10px rgba(229, 9, 20, 0.4);
+    }
+
+    button[onclick="buscarExcelentes()"] {
+        background-color: transparent;
+        border: 2px solid var(--accent);
+        color: var(--accent);
+    }
+
+    button[onclick="buscarExcelentes()"]:hover {
+        background-color: var(--accent);
+        color: black;
+        box-shadow: 0 0 10px rgba(255, 153, 0, 0.4);
+    }
+
+    #resultado {
+        margin-top: 30px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .peli-item {
+        background-color: #2a2a2a;
+        padding: 15px;
+        border-radius: var(--radius);
+        border-top: 3px solid var(--accent);
+        animation: fadeIn 0.5s ease;
+    }
+
+    .peli-item strong {
+        display: block;
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+        color: white;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+        h1 { font-size: 1.8rem; }
+        .card { padding: 15px; }
+    }
+</style>
 </head>
 <body>
-    <h1>🎬 Catálogo de Películas No Relacional</h1>
+    <h1>🎬 Catálogo de Películas</h1>
 
     <div class="card">
         <h3>Insertar Película</h3>
