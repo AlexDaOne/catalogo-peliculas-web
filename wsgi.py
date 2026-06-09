@@ -12,8 +12,14 @@ INDEX_HTML = """
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
         :root { --bg: #141414; --card: #1f1f1f; --red: #E50914; --gold: #FF9900; --txt: #fff; }
+        
         body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--txt); margin: 0; padding: 20px; min-height: 100vh; }
-        h1 { text-align: center; color: var(--red); text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid var(--red); padding-bottom: 10px; }
+        
+        /* HEADER CON LOGO */
+        .header-container { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; padding-left: 10px; }
+        .logo-img { height: 60px; width: auto; filter: drop-shadow(0 0 8px rgba(229, 9, 20, 0.3)); transition: transform 0.3s ease; }
+        .logo-img:hover { transform: scale(1.05) rotate(-2deg); }
+        .site-title { font-size: 2.2rem; color: var(--red); text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid var(--red); padding-bottom: 5px; margin: 0; }
         
         .card { background: var(--card); padding: 25px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); border-left: 4px solid var(--red); }
         h3 { color: var(--red); margin-top: 0; text-transform: uppercase; font-size: 1.1rem; }
@@ -42,11 +48,19 @@ INDEX_HTML = """
         #adminPanel h3 { color: #fff !important; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 600px) { .grid-search { grid-template-columns: 1fr; } }
+        @media (max-width: 600px) { 
+            .grid-search { grid-template-columns: 1fr; } 
+            .header-container { justify-content: center; padding-left: 0; }
+            .site-title { font-size: 1.8rem; }
+        }
     </style>
 </head>
 <body>
-    <h1>🎬 CineMood Catalog</h1>
+    <!-- HEADER CON LOGO INTEGRADO -->
+    <div class="header-container">
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBmaWxsPSJub25lIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzE0MTQxNCIvPjxwYXRoIGQ9Ik0xMDAgMTUwSDQxMlYzNTBIMTAwVjE1MFoiIGZpbGw9IiNFNTA5MTQiLz48cGF0aCBkPSJNMTUwIDEwMEgzNjJMMzEyIDIwMEgxMDBMMTUwIDEwMFoiIGZpbGw9IiNFNTA5MTQiLz48cmVjdCB4PSIxNTAiIHk9IjE4MCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSJ3aGl0ZSIvPjxyZWN0IHg9IjIzMCIgeT0iMTgwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IndoaXRlIi8+PHJlY3QgeD0iMzEwIiB5PSIxODAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0id2hpdGUiLz48cmVjdCB4PSIxNTAiIHk9IjI2MCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSJ3aGl0ZSIvPjxyZWN0IHg9IjIzMCIgeT0iMjYwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IndoaXRlIi8+PHJlY3QgeD0iMzEwIiB5PSIyNjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNMzUwIDIwMEw0MjAgMjU2TDM1MCAzMTJWMjAwWiIgZmlsbD0id2hpdGUiLz48dGV4dCB4PSIyNTYiIHk9IjQ1MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjYwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9ImJvbGQiPkNpbmVNb29kPC90ZXh0Pjwvc3ZnPg==" alt="CineMood Logo" class="logo-img">
+        <h1 class="site-title">Catálogo NoSQL</h1>
+    </div>
 
     <!-- INSERTAR -->
     <div class="card">
@@ -104,7 +118,7 @@ INDEX_HTML = """
             <strong id="admTitulo" style="color: var(--red);"></strong><br>
             <span id="admMeta" style="color: #888; font-size: 0.9rem;"></span>
         </div>
-        <button onclick="eliminarDesdeAdmin()" style="background: #d32f2f; color: white; font-weight: bold;">🗑️ ELIMINAR PELÍCULA SELECCIONADA</button>
+        <button onclick="eliminarDesdeAdmin()" style="background: #d32f2f; color: white; font-weight: bold;">️ ELIMINAR PELÍCULA SELECCIONADA</button>
         <button onclick="cerrarAdmin()" style="background: #333; color: white; margin-top: 10px;">Cerrar Sesión</button>
     </div>
 
@@ -208,25 +222,26 @@ INDEX_HTML = """
         }
 
         async function cargarCatalogoAdmin() {
-    	   try {
-        const res = await fetch(`${API}/catalogo`);
-        const pelis = await res.json();
-        const sel = document.getElementById('adminSelectPeli');
-        sel.innerHTML = '<option value="">-- Selecciona una película --</option>';
-        
-        if(pelis.length === 0) {
-            sel.innerHTML += '<option value="">No hay películas en la BD</option>';
-            return;
+            try {
+                // Usamos la ruta /api/catalogo que trae TODAS las películas
+                const res = await fetch(`${API}/catalogo`);
+                const pelis = await res.json();
+                const sel = document.getElementById('adminSelectPeli');
+                sel.innerHTML = '<option value="">-- Selecciona una película --</option>';
+                
+                if(pelis.length === 0) {
+                    sel.innerHTML += '<option value="">No hay películas en la BD</option>';
+                    return;
+                }
+                
+                pelis.forEach(p => {
+                    sel.innerHTML += `<option value="${p.titulo}">${p.titulo} (${p.anio}) - ${p.valoracion}</option>`;
+                });
+            } catch(e) { 
+                console.error("Error cargando catálogo admin", e); 
+                document.getElementById('adminSelectPeli').innerHTML = '<option>Error al cargar</option>';
+            }
         }
-        
-        pelis.forEach(p => {
-            sel.innerHTML += `<option value="${p.titulo}">${p.titulo} (${p.anio}) - ${p.valoracion}</option>`;
-        });
-    } catch(e) { 
-        console.error("Error cargando catálogo admin", e); 
-        document.getElementById('adminSelectPeli').innerHTML = '<option>Error al cargar</option>';
-    }
-}
 
         function cargarInfoPeli() {
             const titulo = document.getElementById('adminSelectPeli').value;
