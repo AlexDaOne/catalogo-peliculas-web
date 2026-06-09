@@ -1,16 +1,93 @@
 from api.peliculas import app
 from flask import Response
 
-# Leemos el HTML una sola vez al iniciar
-import os
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-HTML_PATH = os.path.join(BASE_DIR, 'public', 'index.html')
+# El HTML ahora vive DENTRO del código Python
+INDEX_HTML = """
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Películas</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f4f4f4; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+        button { background-color: #0070f3; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0051a2; }
+        #resultado { margin-top: 20px; }
+        .peli-item { border-bottom: 1px solid #eee; padding: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🎬 Catálogo de Películas No Relacional</h1>
 
-try:
-    with open(HTML_PATH, 'r', encoding='utf-8') as f:
-        INDEX_HTML = f.read()
-except FileNotFoundError:
-    INDEX_HTML = "<h1>Error: index.html no encontrado</h1>"
+    <div class="card">
+        <h3>Insertar Película</h3>
+        <input type="text" id="titulo" placeholder="Título">
+        <input type="text" id="genero" placeholder="Género">
+        <input type="number" id="anio" placeholder="Año">
+        <input type="number" id="valoracion" placeholder="Valoración (0-10)" step="0.1">
+        <button onclick="insertar()">Guardar Película</button>
+    </div>
+
+    <div class="card">
+        <h3>Buscar por Género</h3>
+        <input type="text" id="busquedaGenero" placeholder="Ej: Acción">
+        <button onclick="buscarGenero()">Buscar</button>
+        <button onclick="buscarExcelentes()" style="background-color: #ff9900;">Ver Excelentes (>=9)</button>
+    </div>
+
+    <div id="resultado"></div>
+
+    <script>
+        const API_URL = '/api'; 
+
+        async function insertar() {
+            const data = {
+                titulo: document.getElementById('titulo').value,
+                genero: document.getElementById('genero').value,
+                anio: document.getElementById('anio').value,
+                valoracion: document.getElementById('valoracion').value
+            };
+            
+            const res = await fetch(`${API_URL}/insertar`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            const json = await res.json();
+            alert(json.mensaje || json.error);
+        }
+
+        async function buscarGenero() {
+            const genero = document.getElementById('busquedaGenero').value;
+            const res = await fetch(`${API_URL}/buscar_genero?genero=${genero}`);
+            const pelis = await res.json();
+            mostrarResultados(pelis);
+        }
+
+        async function buscarExcelentes() {
+            const res = await fetch(`${API_URL}/excelentes`);
+            const pelis = await res.json();
+            mostrarResultados(pelis);
+        }
+
+        function mostrarResultados(pelis) {
+            const div = document.getElementById('resultado');
+            div.innerHTML = '';
+            if(pelis.length === 0) {
+                div.innerHTML = '<p>No se encontraron resultados.</p>';
+                return;
+            }
+            pelis.forEach(p => {
+                div.innerHTML += `<div class="peli-item"><strong>${p.titulo}</strong> (${p.anio}) - ${p.genero} | ⭐ ${p.valoracion}</div>`;
+            });
+        }
+    </script>
+</body>
+</html>
+"""
 
 @app.route('/')
 def home():
