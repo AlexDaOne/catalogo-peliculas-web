@@ -26,6 +26,8 @@ INDEX_HTML = """
         .btn-primary:hover { background: #f40612; box-shadow: 0 0 10px rgba(229,9,20,0.5); }
         .btn-gold { background: transparent; border: 2px solid var(--gold); color: var(--gold); margin-top: 15px; }
         .btn-gold:hover { background: var(--gold); color: black; }
+        .btn-admin { background: transparent; border: 2px solid #fff; color: #fff; margin-top: 10px; }
+        .btn-admin:hover { background: #fff; color: black; }
         
         .grid-search { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
         .grid-search input { margin-top: 5px; }
@@ -35,6 +37,9 @@ INDEX_HTML = """
         .peli-title { font-size: 1.2rem; font-weight: bold; display: block; margin-bottom: 5px; }
         .peli-meta { color: #b3b3b3; font-size: 0.9rem; }
         .peli-rating { color: var(--gold); font-weight: bold; }
+        
+        #adminPanel { border-left-color: #fff !important; }
+        #adminPanel h3 { color: #fff !important; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 600px) { .grid-search { grid-template-columns: 1fr; } }
@@ -57,12 +62,10 @@ INDEX_HTML = """
     <div class="card">
         <h3>🔍 Búsqueda Inteligente</h3>
         
-        <!-- Por Título (Principal) -->
         <input type="text" id="busquedaTitulo" placeholder="Buscar título (ej: 'Scary' encuentra todas las partes)">
         <button class="btn-primary" onclick="buscarPorTitulo()">Buscar por Nombre</button>
 
         <div class="grid-search">
-            <!-- Por Valoración -->
             <div>
                 <label style="color:#aaa; font-size:0.8rem;">RANGO DE VALORACIÓN</label>
                 <div style="display:flex; gap:5px;">
@@ -71,8 +74,6 @@ INDEX_HTML = """
                 </div>
                 <button onclick="buscarPorRango()" style="background:#333; color:white; margin-top:5px;">Filtrar Rating</button>
             </div>
-
-            <!-- Por Año -->
             <div>
                 <label style="color:#aaa; font-size:0.8rem;">AÑO DE ESTRENO</label>
                 <input type="number" id="busquedaAnio" placeholder="Ej: 2000">
@@ -80,7 +81,6 @@ INDEX_HTML = """
             </div>
         </div>
 
-        <!-- Por Género (Dinámico) -->
         <div style="margin-top: 15px;">
             <label style="color:#aaa; font-size:0.8rem;">FILTRAR POR GÉNERO</label>
             <select id="busquedaGenero"><option>Cargando géneros...</option></select>
@@ -88,12 +88,31 @@ INDEX_HTML = """
         </div>
 
         <button class="btn-gold" onclick="buscarExcelentes()">⭐ Ver Obras Maestras (>= 9.0)</button>
+        
+        <!-- BOTÓN ADMIN -->
+        <button class="btn-admin" onclick="activarAdmin()">🔒 Acceso Administrador</button>
+    </div>
+
+    <!-- PANEL ADMIN OCULTO -->
+    <div id="adminPanel" class="card" style="display:none;">
+        <h3>⚙️ Panel de Administración</h3>
+        <p style="color:#aaa; font-size:0.9rem;">Selecciona una película para eliminarla permanentemente.</p>
+        <select id="adminSelectPeli" onchange="cargarInfoPeli()">
+            <option value="">Cargando catálogo...</option>
+        </select>
+        <div id="adminInfo" style="margin: 15px 0; padding: 10px; background: #141414; border-radius: 4px; display:none;">
+            <strong id="admTitulo" style="color: var(--red);"></strong><br>
+            <span id="admMeta" style="color: #888; font-size: 0.9rem;"></span>
+        </div>
+        <button onclick="eliminarDesdeAdmin()" style="background: #d32f2f; color: white; font-weight: bold;">🗑️ ELIMINAR PELÍCULA SELECCIONADA</button>
+        <button onclick="cerrarAdmin()" style="background: #333; color: white; margin-top: 10px;">Cerrar Sesión</button>
     </div>
 
     <div id="resultado"></div>
 
     <script>
         const API = '/api';
+        const ADMIN_PASS = "admin123";
 
         // Cargar géneros al iniciar
         window.onload = async () => {
@@ -154,7 +173,6 @@ INDEX_HTML = """
             });
             const json = await res.json();
             alert(json.mensaje || json.error);
-            // Recargar géneros por si acaso se agregó uno nuevo
             window.onload(); 
         }
 
@@ -175,6 +193,70 @@ INDEX_HTML = """
                     </div>
                 </div>`;
             });
+        }
+
+        // --- FUNCIONES ADMIN ---
+        async function activarAdmin() {
+            const pass = prompt("Ingrese contraseña de administrador:");
+            if(pass === ADMIN_PASS) {
+                document.getElementById('adminPanel').style.display = 'block';
+                await cargarCatalogoAdmin();
+                alert("✅ Acceso concedido. Modo Administrador activo.");
+            } else if(pass !== null) {
+                alert("❌ Contraseña incorrecta.");
+            }
+        }
+
+        async function cargarCatalogoAdmin() {
+            try {
+                const res = await fetch(`${API}/buscar_titulo?q=`); 
+                const pelis = await res.json();
+                const sel = document.getElementById('adminSelectPeli');
+                sel.innerHTML = '<option value="">-- Selecciona una película --</option>';
+                pelis.forEach(p => {
+                    sel.innerHTML += `<option value="${p.titulo}">${p.titulo} (${p.anio})</option>`;
+                });
+            } catch(e) { console.error("Error cargando catálogo admin", e); }
+        }
+
+        function cargarInfoPeli() {
+            const titulo = document.getElementById('adminSelectPeli').value;
+            const infoDiv = document.getElementById('adminInfo');
+            if(!titulo) { infoDiv.style.display = 'none'; return; }
+            const options = document.getElementById('adminSelectPeli').options;
+            for(let i=0; i<options.length; i++) {
+                if(options[i].value === titulo) {
+                    document.getElementById('admTitulo').textContent = options[i].text;
+                    infoDiv.style.display = 'block';
+                    break;
+                }
+            }
+        }
+
+        async function eliminarDesdeAdmin() {
+            const titulo = document.getElementById('adminSelectPeli').value;
+            if(!titulo) return alert("Selecciona una película primero");
+            if(!confirm(`¿Estás seguro de eliminar "${titulo}"? Esta acción no se puede deshacer.`)) return;
+            
+            const res = await fetch(`${API}/eliminar`, {
+                method: 'DELETE',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({titulo: titulo})
+            });
+            const json = await res.json();
+            if(res.ok) {
+                alert("✅ Película eliminada correctamente.");
+                await cargarCatalogoAdmin();
+                document.getElementById('adminInfo').style.display = 'none';
+            } else {
+                alert(" Error: " + json.mensaje);
+            }
+        }
+
+        function cerrarAdmin() {
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminSelectPeli').value = "";
+            document.getElementById('adminInfo').style.display = 'none';
         }
     </script>
 </body>
