@@ -72,5 +72,43 @@ def obtener_generos():
     generos.sort()
     return jsonify(generos)
 
+@app.route('/api/buscar_titulo', methods=['GET'])
+def buscar_titulo():
+    titulo = request.args.get('q')
+    if not titulo:
+        return jsonify([])
+    # $regex con 'i' hace la búsqueda insensible a mayúsculas/minúsculas
+    resultados = list(coleccion.find({"titulo": {"$regex": titulo, "$options": "i"}}))
+    for r in resultados:
+        r['_id'] = str(r['_id'])
+    return jsonify(resultados)
+
+@app.route('/api/buscar_rango', methods=['GET'])
+def buscar_rango():
+    min_val = float(request.args.get('min', 0))
+    max_val = float(request.args.get('max', 10))
+    resultados = list(coleccion.find({
+        "valoracion": {"$gte": min_val, "$lte": max_val}
+    }))
+    for r in resultados:
+        r['_id'] = str(r['_id'])
+    return jsonify(resultados)
+
+@app.route('/api/buscar_anio', methods=['GET'])
+def buscar_anio():
+    anio = request.args.get('anio')
+    if not anio:
+        return jsonify([])
+    # Busca coincidencia exacta o parcial si es string
+    try:
+        anio_int = int(anio)
+        resultados = list(coleccion.find({"anio": anio_int}))
+    except ValueError:
+        resultados = list(coleccion.find({"anio": {"$regex": str(anio)}}))
+        
+    for r in resultados:
+        r['_id'] = str(r['_id'])
+    return jsonify(resultados)	
+
 if __name__ == '__main__':
     app.run(debug=True)

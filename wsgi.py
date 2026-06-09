@@ -1,255 +1,185 @@
 from api.peliculas import app
 from flask import Response
 
-# --- INICIO DEL HTML CON ESTILO CINEMOOD Y SELECTOR DINÁMICO ---
+# --- TODO EL SITIO WEB ESTÁ AQUÍ DENTRO ---
 INDEX_HTML = """
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo de Películas No Relacional</title>
+    <title>CineMood - Catálogo NoSQL</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
-
-        :root {
-            --bg-color: #141414;
-            --card-bg: #1f1f1f;
-            --primary: #E50914;
-            --accent: #FF9900;
-            --text-main: #ffffff;
-            --radius: 8px;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 30px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            border-bottom: 2px solid var(--primary);
-            display: inline-block;
-            padding-bottom: 10px;
-            width: 100%;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            padding: 25px;
-            border-radius: var(--radius);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            margin-bottom: 25px;
-            border-left: 4px solid var(--primary);
-            transition: transform 0.2s ease;
-        }
-
-        .card:hover { transform: translateY(-3px); }
-
-        h3 {
-            margin-top: 0;
-            color: var(--primary);
-            font-size: 1.2rem;
-            text-transform: uppercase;
-        }
-
-        input, select {
-            background-color: #333;
-            border: 1px solid #444;
-            color: white;
-            padding: 12px;
-            margin: 8px 0;
-            width: 100%;
-            box-sizing: border-box;
-            border-radius: 4px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-            background-color: #444;
-        }
-
-        button {
-            padding: 12px 20px;
-            margin: 10px 5px 0 0;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        button[onclick="insertar()"], 
-        button[onclick="buscarGenero()"] {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        button[onclick="insertar()"]:hover, 
-        button[onclick="buscarGenero()"]:hover {
-            background-color: #f40612;
-            box-shadow: 0 0 10px rgba(229, 9, 20, 0.4);
-        }
-
-        button[onclick="buscarExcelentes()"] {
-            background-color: transparent;
-            border: 2px solid var(--accent);
-            color: var(--accent);
-        }
-
-        button[onclick="buscarExcelentes()"]:hover {
-            background-color: var(--accent);
-            color: black;
-            box-shadow: 0 0 10px rgba(255, 153, 0, 0.4);
-        }
-
-        #resultado {
-            margin-top: 30px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .peli-item {
-            background-color: #2a2a2a;
-            padding: 15px;
-            border-radius: var(--radius);
-            border-top: 3px solid var(--accent);
-            animation: fadeIn 0.5s ease;
-        }
-
-        .peli-item strong {
-            display: block;
-            font-size: 1.1rem;
-            margin-bottom: 5px;
-            color: white;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 600px) {
-            h1 { font-size: 1.8rem; }
-            .card { padding: 15px; }
-        }
+        :root { --bg: #141414; --card: #1f1f1f; --red: #E50914; --gold: #FF9900; --txt: #fff; }
+        body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--txt); margin: 0; padding: 20px; min-height: 100vh; }
+        h1 { text-align: center; color: var(--red); text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid var(--red); padding-bottom: 10px; }
+        
+        .card { background: var(--card); padding: 25px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); border-left: 4px solid var(--red); }
+        h3 { color: var(--red); margin-top: 0; text-transform: uppercase; font-size: 1.1rem; }
+        
+        input, select { width: 100%; padding: 12px; margin: 8px 0; background: #333; border: 1px solid #444; color: white; border-radius: 4px; box-sizing: border-box; font-size: 1rem; }
+        input:focus, select:focus { outline: none; border-color: var(--red); }
+        
+        button { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .btn-primary { background: var(--red); color: white; }
+        .btn-primary:hover { background: #f40612; box-shadow: 0 0 10px rgba(229,9,20,0.5); }
+        .btn-gold { background: transparent; border: 2px solid var(--gold); color: var(--gold); margin-top: 15px; }
+        .btn-gold:hover { background: var(--gold); color: black; }
+        
+        .grid-search { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .grid-search input { margin-top: 5px; }
+        
+        #resultado { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 30px; }
+        .peli-item { background: #2a2a2a; padding: 15px; border-radius: 8px; border-top: 3px solid var(--gold); animation: fadeIn 0.4s ease; }
+        .peli-title { font-size: 1.2rem; font-weight: bold; display: block; margin-bottom: 5px; }
+        .peli-meta { color: #b3b3b3; font-size: 0.9rem; }
+        .peli-rating { color: var(--gold); font-weight: bold; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 600px) { .grid-search { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-    <h1>🎬 Catálogo de Películas No Relacional</h1>
+    <h1>🎬 CineMood Catalog</h1>
 
+    <!-- INSERTAR -->
     <div class="card">
-        <h3>Insertar Película</h3>
-        <input type="text" id="titulo" placeholder="Título">
-        <input type="text" id="genero" placeholder="Género (ej: Acción)">
-        <input type="number" id="anio" placeholder="Año">
+        <h3>Agregar Película</h3>
+        <input type="text" id="titulo" placeholder="Título exacto">
+        <input type="text" id="generoInput" placeholder="Género (ej: Acción)">
+        <input type="number" id="anio" placeholder="Año (ej: 2024)">
         <input type="number" id="valoracion" placeholder="Valoración (0-10)" step="0.1">
-        <button onclick="insertar()">Guardar Película</button>
+        <button class="btn-primary" onclick="insertar()">Guardar en Base de Datos</button>
     </div>
 
+    <!-- BÚSQUEDAS AVANZADAS -->
     <div class="card">
-        <h3>Buscar por Género</h3>
-        <!-- AQUÍ ESTÁ EL CAMBIO CLAVE: SELECT EN LUGAR DE INPUT -->
-        <select id="busquedaGenero">
-            <option value="">Cargando géneros...</option>
-        </select>
+        <h3>🔍 Búsqueda Inteligente</h3>
         
-        <button onclick="buscarGenero()">Buscar</button>
-        <button onclick="buscarExcelentes()">Ver Excelentes (>=9)</button>
+        <!-- Por Título (Principal) -->
+        <input type="text" id="busquedaTitulo" placeholder="Buscar título (ej: 'Scary' encuentra todas las partes)">
+        <button class="btn-primary" onclick="buscarPorTitulo()">Buscar por Nombre</button>
+
+        <div class="grid-search">
+            <!-- Por Valoración -->
+            <div>
+                <label style="color:#aaa; font-size:0.8rem;">RANGO DE VALORACIÓN</label>
+                <div style="display:flex; gap:5px;">
+                    <input type="number" id="valMin" placeholder="Min (0)" step="0.1">
+                    <input type="number" id="valMax" placeholder="Max (10)" step="0.1">
+                </div>
+                <button onclick="buscarPorRango()" style="background:#333; color:white; margin-top:5px;">Filtrar Rating</button>
+            </div>
+
+            <!-- Por Año -->
+            <div>
+                <label style="color:#aaa; font-size:0.8rem;">AÑO DE ESTRENO</label>
+                <input type="number" id="busquedaAnio" placeholder="Ej: 2000">
+                <button onclick="buscarPorAnio()" style="background:#333; color:white; margin-top:5px;">Buscar Año</button>
+            </div>
+        </div>
+
+        <!-- Por Género (Dinámico) -->
+        <div style="margin-top: 15px;">
+            <label style="color:#aaa; font-size:0.8rem;">FILTRAR POR GÉNERO</label>
+            <select id="busquedaGenero"><option>Cargando géneros...</option></select>
+            <button onclick="buscarPorGenero()" style="background:#333; color:white; margin-top:5px;">Ver por Género</button>
+        </div>
+
+        <button class="btn-gold" onclick="buscarExcelentes()">⭐ Ver Obras Maestras (>= 9.0)</button>
     </div>
 
     <div id="resultado"></div>
 
     <script>
-        const API_URL = '/api'; 
+        const API = '/api';
 
-        // FUNCIÓN NUEVA: Cargar géneros desde la BD al iniciar
-        async function cargarGeneros() {
+        // Cargar géneros al iniciar
+        window.onload = async () => {
             try {
-                const res = await fetch(`${API_URL}/generos`);
+                const res = await fetch(`${API}/generos`);
                 const generos = await res.json();
-                const select = document.getElementById('busquedaGenero');
-                
-                select.innerHTML = '<option value="">-- Selecciona un género --</option>';
-                
+                const sel = document.getElementById('busquedaGenero');
+                sel.innerHTML = '<option value="">-- Todos los géneros --</option>';
                 generos.forEach(g => {
-                    const option = document.createElement('option');
-                    option.value = g;
-                    option.textContent = g;
-                    select.appendChild(option);
+                    sel.innerHTML += `<option value="${g}">${g}</option>`;
                 });
-            } catch (error) {
-                console.error("Error cargando géneros:", error);
-                document.getElementById('busquedaGenero').innerHTML = '<option>Error al cargar</option>';
-            }
+            } catch(e) { console.error("Error cargando géneros", e); }
+        };
+
+        // Funciones de búsqueda
+        async function buscarPorTitulo() {
+            const q = document.getElementById('busquedaTitulo').value;
+            if(!q) return alert("Escribe un título");
+            const res = await fetch(`${API}/buscar_titulo?q=${encodeURIComponent(q)}`);
+            mostrar(await res.json(), `Resultados para "${q}"`);
         }
 
-        // Ejecutar al cargar la página
-        window.onload = cargarGeneros;
+        async function buscarPorRango() {
+            const min = document.getElementById('valMin').value || 0;
+            const max = document.getElementById('valMax').value || 10;
+            const res = await fetch(`${API}/buscar_rango?min=${min}&max=${max}`);
+            mostrar(await res.json(), `Rating entre ${min} y ${max}`);
+        }
+
+        async function buscarPorAnio() {
+            const anio = document.getElementById('busquedaAnio').value;
+            if(!anio) return alert("Ingresa un año");
+            const res = await fetch(`${API}/buscar_anio?anio=${anio}`);
+            mostrar(await res.json(), `Estrenos de ${anio}`);
+        }
+
+        async function buscarPorGenero() {
+            const g = document.getElementById('busquedaGenero').value;
+            if(!g) return alert("Selecciona un género");
+            const res = await fetch(`${API}/buscar_genero?genero=${g}`);
+            mostrar(await res.json(), `Género: ${g}`);
+        }
+
+        async function buscarExcelentes() {
+            const res = await fetch(`${API}/excelentes`);
+            mostrar(await res.json(), "⭐ Obras Maestras (>= 9.0)");
+        }
 
         async function insertar() {
             const data = {
                 titulo: document.getElementById('titulo').value,
-                genero: document.getElementById('genero').value,
+                genero: document.getElementById('generoInput').value,
                 anio: document.getElementById('anio').value,
                 valoracion: document.getElementById('valoracion').value
             };
-            
-            const res = await fetch(`${API_URL}/insertar`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
+            const res = await fetch(`${API}/insertar`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
             });
             const json = await res.json();
             alert(json.mensaje || json.error);
+            // Recargar géneros por si acaso se agregó uno nuevo
+            window.onload(); 
         }
 
-        async function buscarGenero() {
-            const genero = document.getElementById('busquedaGenero').value;
-            if(!genero) { alert("Por favor selecciona un género"); return; }
-            
-            const res = await fetch(`${API_URL}/buscar_genero?genero=${genero}`);
-            const pelis = await res.json();
-            mostrarResultados(pelis);
-        }
-
-        async function buscarExcelentes() {
-            const res = await fetch(`${API_URL}/excelentes`);
-            const pelis = await res.json();
-            mostrarResultados(pelis);
-        }
-
-        function mostrarResultados(pelis) {
+        function mostrar(pelis, titulo) {
             const div = document.getElementById('resultado');
-            div.innerHTML = '';
+            div.innerHTML = `<h2 style="color:var(--gold); width:100%;">${titulo}</h2>`;
             if(pelis.length === 0) {
-                div.innerHTML = '<p style="color:#b3b3b3; text-align:center;">No se encontraron resultados.</p>';
+                div.innerHTML += '<p style="color:#888; width:100%;">No se encontraron películas.</p>';
                 return;
             }
             pelis.forEach(p => {
-                div.innerHTML += `<div class="peli-item"><strong>${p.titulo}</strong> (${p.anio}) - ${p.genero} | ⭐ ${p.valoracion}</div>`;
+                div.innerHTML += `
+                <div class="peli-item">
+                    <span class="peli-title">${p.titulo}</span>
+                    <div class="peli-meta">
+                         ${p.anio} | 🎭 ${p.genero}<br>
+                        <span class="peli-rating">⭐ ${p.valoracion}/10</span>
+                    </div>
+                </div>`;
             });
         }
     </script>
 </body>
 </html>
 """
-# --- FIN DEL HTML ---
 
 @app.route('/')
 def home():
