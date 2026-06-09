@@ -8,7 +8,7 @@ INDEX_HTML = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineMood - Catálogo NoSQL</title>
+    <title>CineMood - Catálogo CineMood</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
         :root { --bg: #141414; --card: #1f1f1f; --red: #E50914; --gold: #FF9900; --txt: #fff; }
@@ -59,7 +59,7 @@ INDEX_HTML = """
     <!-- HEADER CON LOGO INTEGRADO -->
     <div class="header-container">
         <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBmaWxsPSJub25lIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzE0MTQxNCIvPjxwYXRoIGQ9Ik0xMDAgMTUwSDQxMlYzNTBIMTAwVjE1MFoiIGZpbGw9IiNFNTA5MTQiLz48cGF0aCBkPSJNMTUwIDEwMEgzNjJMMzEyIDIwMEgxMDBMMTUwIDEwMFoiIGZpbGw9IiNFNTA5MTQiLz48cmVjdCB4PSIxNTAiIHk9IjE4MCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSJ3aGl0ZSIvPjxyZWN0IHg9IjIzMCIgeT0iMTgwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IndoaXRlIi8+PHJlY3QgeD0iMzEwIiB5PSIxODAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0id2hpdGUiLz48cmVjdCB4PSIxNTAiIHk9IjI2MCIgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSJ3aGl0ZSIvPjxyZWN0IHg9IjIzMCIgeT0iMjYwIiB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IndoaXRlIi8+PHJlY3QgeD0iMzEwIiB5PSIyNjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0id2hpdGUiLz48cGF0aCBkPSJNMzUwIDIwMEw0MjAgMjU2TDM1MCAzMTJWMjAwWiIgZmlsbD0id2hpdGUiLz48dGV4dCB4PSIyNTYiIHk9IjQ1MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjYwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9ImJvbGQiPkNpbmVNb29kPC90ZXh0Pjwvc3ZnPg==" alt="CineMood Logo" class="logo-img">
-        <h1 class="site-title">Catálogo NoSQL</h1>
+        <h1 class="site-title">Catálogo CineMood</h1>
     </div>
 
     <!-- INSERTAR -->
