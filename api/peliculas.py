@@ -5,8 +5,6 @@ import os
 
 app = Flask(__name__)
 
-# --- CONEXIÓN A MONGODB ---
-# Usamos variables de entorno para seguridad (Vercel las maneja automáticamente)
 uri = os.environ.get('MONGO_URI') or "mongodb+srv://user_peliculas:PeliProyecto2026!@proyectofinalpeliculas.ib1aupa.mongodb.net/?appName=ProyectoFinalPeliculas"
 
 try:
@@ -15,8 +13,6 @@ try:
     coleccion = db['peliculas']
 except Exception as e:
     print(f"Error de conexión: {e}")
-
-# --- RUTAS DE LA API ---
 
 @app.route('/api/insertar', methods=['POST'])
 def insertar():
@@ -67,6 +63,14 @@ def eliminar():
     if resultado.deleted_count > 0:
         return jsonify({"mensaje": "Eliminado"}), 200
     return jsonify({"mensaje": "No encontrado"}), 404
+
+@app.route('/api/generos', methods=['GET'])
+def obtener_generos():
+    # Obtiene todos los géneros únicos de la base de datos
+    generos = coleccion.distinct('genero')
+    # Los ordena alfabéticamente para que se vean mejor en el menú
+    generos.sort()
+    return jsonify(generos)
 
 if __name__ == '__main__':
     app.run(debug=True)
