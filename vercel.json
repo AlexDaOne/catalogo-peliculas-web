@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/peliculas.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "api/peliculas.py" },
+    { "src": "/(.*)", "dest": "/public/index.html" }
+  ]
+}
