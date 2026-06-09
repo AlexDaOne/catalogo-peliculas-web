@@ -118,5 +118,29 @@ def buscar_anio():
         r['_id'] = str(r['_id'])
     return jsonify(resultados)	
 
+@app.route('/api/buscar_franquicia', methods=['GET'])
+def buscar_franquicia():
+    franquicia = request.args.get('nombre')
+    
+    if not franquicia:
+        return jsonify([])
+        
+    # Diccionario de palabras clave para identificar cada universo
+    keywords = {
+        'marvel': ['Iron Man', 'Avengers', 'Spider-Man', 'Guardians', 'Thor', 'Hulk', 'Captain America', 'Black Panther', 'Ant-Man', 'Doctor Strange', 'Captain Marvel'],
+        'dc': ['Batman', 'Superman', 'Wonder Woman', 'Aquaman', 'Flash', 'Joker', 'Harley', 'Shazam', 'Cyborg', 'Green Lantern'],
+        'starwars': ['Star Wars', 'Rogue One', 'Solo']
+    }
+    
+    terminos = keywords.get(franquicia.lower(), [franquicia])
+    
+    # Búsqueda OR con regex para encontrar cualquiera de los términos
+    query = {"$or": [{"titulo": {"$regex": t, "$options": "i"}} for t in terminos]}
+    
+    resultados = list(coleccion.find(query))
+    for r in resultados:
+        r['_id'] = str(r['_id'])
+    return jsonify(resultados)
+
 if __name__ == '__main__':
     app.run(debug=True)

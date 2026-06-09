@@ -102,6 +102,16 @@ INDEX_HTML = """
         </div>
 
         <button class="btn-gold" onclick="buscarExcelentes()">⭐ Ver Obras Maestras (>= 9.0)</button>
+
+        <!-- SELECCIÓN DE UNIVERSO CINEMATOGRÁFICO -->
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #333;">
+            <label style="color:#aaa; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px;">Explorar Universos Cinematográficos</label>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;">
+                <button onclick="buscarFranquicia('marvel')" style="background: #E23636; color: white; border: none; font-weight:bold;">🦸 MARVEL</button>
+                <button onclick="buscarFranquicia('dc')" style="background: #0476F2; color: white; border: none; font-weight:bold;">🦇 DC COMICS</button>
+                <button onclick="buscarFranquicia('starwars')" style="background: #FFE81F; color: black; border: none; font-weight:bold;">️ STAR WARS</button>
+            </div>
+        </div>
         
         <!-- BOTÓN ADMIN -->
         <button class="btn-admin" onclick="activarAdmin()">🔒 Acceso Administrador</button>
@@ -282,7 +292,20 @@ INDEX_HTML = """
             document.getElementById('adminSelectPeli').value = "";
             document.getElementById('adminInfo').style.display = 'none';
         }
-    </script>
+
+        async function buscarFranquicia(universo) {
+        const res = await fetch(`${API}/buscar_franquicia?nombre=${universo}`);
+        const pelis = await res.json();
+        
+        const nombresUniverso = {
+            'marvel': '🦸 Universo Cinematográfico Marvel (MCU)',
+            'dc': '🦇 Universo Extendido DC (DCEU)',
+            'starwars': '⚔️ Saga Star Wars'
+        };
+        
+        mostrar(pelis, nombresUniverso[universo] || `Resultados para ${universo}`);
+    }
+</script>
 </body>
 </html>
 """
