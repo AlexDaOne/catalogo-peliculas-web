@@ -72,6 +72,14 @@ def obtener_generos():
     generos.sort()
     return jsonify(generos)
 
+@app.route('/api/catalogo', methods=['GET'])
+def obtener_catalogo():
+    # Obtiene TODAS las películas de la colección
+    pelis = list(coleccion.find())
+    for p in pelis:
+        p['_id'] = str(p['_id'])
+    return jsonify(pelis)
+
 @app.route('/api/buscar_titulo', methods=['GET'])
 def buscar_titulo():
     titulo = request.args.get('q')

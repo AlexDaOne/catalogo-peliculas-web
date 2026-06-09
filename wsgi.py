@@ -208,16 +208,25 @@ INDEX_HTML = """
         }
 
         async function cargarCatalogoAdmin() {
-            try {
-                const res = await fetch(`${API}/buscar_titulo?q=`); 
-                const pelis = await res.json();
-                const sel = document.getElementById('adminSelectPeli');
-                sel.innerHTML = '<option value="">-- Selecciona una película --</option>';
-                pelis.forEach(p => {
-                    sel.innerHTML += `<option value="${p.titulo}">${p.titulo} (${p.anio})</option>`;
-                });
-            } catch(e) { console.error("Error cargando catálogo admin", e); }
+    	   try {
+        const res = await fetch(`${API}/catalogo`);
+        const pelis = await res.json();
+        const sel = document.getElementById('adminSelectPeli');
+        sel.innerHTML = '<option value="">-- Selecciona una película --</option>';
+        
+        if(pelis.length === 0) {
+            sel.innerHTML += '<option value="">No hay películas en la BD</option>';
+            return;
         }
+        
+        pelis.forEach(p => {
+            sel.innerHTML += `<option value="${p.titulo}">${p.titulo} (${p.anio}) - ${p.valoracion}</option>`;
+        });
+    } catch(e) { 
+        console.error("Error cargando catálogo admin", e); 
+        document.getElementById('adminSelectPeli').innerHTML = '<option>Error al cargar</option>';
+    }
+}
 
         function cargarInfoPeli() {
             const titulo = document.getElementById('adminSelectPeli').value;
