@@ -4,7 +4,6 @@
     { "src": "wsgi.py", "use": "@vercel/python" }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "wsgi.py" },
-    { "src": "/(.*)", "dest": "/public/$1" }
+    { "src": "/(.*)", "dest": "wsgi.py" }
   ]
 }
