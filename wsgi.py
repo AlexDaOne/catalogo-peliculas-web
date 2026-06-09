@@ -1,15 +1,20 @@
-import os
 from api.peliculas import app
-from flask import send_from_directory
+from flask import Response
 
-# Obtenemos la carpeta base donde está wsgi.py
+# Leemos el HTML una sola vez al iniciar
+import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+HTML_PATH = os.path.join(BASE_DIR, 'public', 'index.html')
+
+try:
+    with open(HTML_PATH, 'r', encoding='utf-8') as f:
+        INDEX_HTML = f.read()
+except FileNotFoundError:
+    INDEX_HTML = "<h1>Error: index.html no encontrado</h1>"
 
 @app.route('/')
 def home():
-    # Buscamos index.html en la carpeta 'public' que está al lado de wsgi.py
-    public_folder = os.path.join(BASE_DIR, 'public')
-    return send_from_directory(public_folder, 'index.html')
+    return Response(INDEX_HTML, mimetype='text/html')
 
 if __name__ == "__main__":
     app.run()
